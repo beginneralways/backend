@@ -33,26 +33,20 @@ exports.signup = async (req, res) => {
 };
 
 // Controller for user login
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // Check if the user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
-    }
-
-    // Compare passwords
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+exports.login = (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err || !user) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Error logging in.', error });
-  }
+    req.login(user, { session: false }, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
+      return res.status(200).json({ token });
+    });
+  })(req, res, next);
 };

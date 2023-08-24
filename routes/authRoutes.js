@@ -1,4 +1,5 @@
 const express = require('express');
+const passport = require('passport');  // Import passport before using it
 const authController = require('../controllers/authController');
 
 const router = express.Router();
@@ -7,6 +8,6 @@ const router = express.Router();
 router.post('/signup', authController.signup);
 
 // Route for user login
-router.post('/login', authController.login);
+router.post('/login', passport.authenticate('local', { session: false }), authController.login);
 
 module.exports = router;
