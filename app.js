@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const config = require('./config/config');
 const itemRoutes = require('./routes/itemRoutes');
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
@@ -22,8 +23,10 @@ db.once('open', () => {
 });
 
 // Routes
-// app.use('/api/items', itemRoutes);
-// app.use('/api/auth', authRoutes);
+app.use('/api/items', itemRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+
 
 // Start the server
 const PORT = config.PORT||5999;
